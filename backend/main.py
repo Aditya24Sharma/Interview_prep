@@ -3,6 +3,7 @@ import json
 import google.generativeai as genai
 from dotenv import load_dotenv
 import os
+from utils import save_questions
 
 app = FastAPI()
 
@@ -12,6 +13,15 @@ api_key = os.getenv('GOOGLE_API_KEY')
 
 
 def query(prompt):
+    '''
+    {
+        "easy":{
+                "Question":"...",
+                "Answer":"..."
+            },
+            "medium:{...}
+    }
+    '''
     model = genai.GenerativeModel("gemini-1.5-flash")
     genai.configure(api_key = api_key  )
     structured_propmt = f"""
@@ -39,9 +49,8 @@ def query(prompt):
         5. Make questions and answers relevant to the following context:
 
         {prompt}
-
-        
         """
+    
     response = model.generate_content([
         structured_propmt
     ])
@@ -50,8 +59,11 @@ def query(prompt):
 
 @app.get("/")
 def read_root():
-    prompt = 'title: Front end developer, position: intern '
+    job_title = 'Front end developer'
+    position= 'intern'
+    prompt = f'title: {job_title}, position: {position} '
     response = query(prompt)
     print(response)
     json_obj = json.loads(response)
+    save_questions(job_title, position, json_obj)
     return {"message": json_obj}
