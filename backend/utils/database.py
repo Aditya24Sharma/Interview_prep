@@ -1,4 +1,5 @@
 from supabase import create_client, Client
+from typing import List,Dict, Any
 from dotenv import load_dotenv
 import os
 
@@ -34,9 +35,9 @@ def to_question_set(job_title, position, question_set):
 
     try: 
         response = supabase.table("question_set").insert(data).execute()
+        print("Question_set Saved")
         if response.data: #this takes the lastest row that we created
             questionset_id = response.data[0]["questionset_id"]
-            print("Question_set Saved")
             to_question(questionset_id, question_set)
         else: 
             print("Error: No data returned after insertion")
@@ -70,6 +71,7 @@ def to_question(set_id, question_set):
         })
 
     try: 
+        print('Saving Questions')
         supabase.table("question").insert(data).execute()
         print('Questions Saved')
         
@@ -102,7 +104,7 @@ def get_user_answer(questionset_id):
     
 
 
-def get_questions(question_id):
+def get_questions(question_ids: List[str]):
     """
     CREATE TABLE Question (
     question_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -113,9 +115,126 @@ def get_questions(question_id):
     );
     """
     try:
-        response = supabase.table("question").select("*").in_("question_id",question_id).execute()
+        response = supabase.table("question").select("*").in_("question_id",question_ids).execute()
         print("Questions successfully fetched")
         return response.data
     except Exception as e:
-        print(f"Error fetchind questions: {e}")
+        print(f"Error fetching questions: {e}")
+        return None
+
+
+def get_question_set(questionset_id):
+    '''
+    CREATE TABLE Question_set (
+    questionset_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    job_title TEXT NOT NULL,
+    position TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT now()
+    );
+    '''
+    try: 
+        response = supabase.table("question_set").select("*").eq("questionset_id", questionset_id).execute()
+        print("Success: Question_set Retrived")
+        return response.data
+    except Exception as e:
+        print(f"Error: Question_set Retrival : {e}")
+        return None
+
+
+def set_feedbackset(questionset_id, job_title, position, feedbacks):
+    """
+    CREATE TABLE Feedback_set (
+    feedbackset_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    questionset_id UUID REFERENCES Question_set(questionset_id) ON DELETE CASCADE,
+    job_title TEXT NOT NULL,
+    position TEXT NOT NULL,
+    overall_rating NUMERIC,
+    summary_feedback TEXT
+    );
+
+    feedbacks : {
+        "feedback_set":{
+            "easy":{
+                "Question": {...},
+                "Answer":{...},
+                "user_Answer":{...},
+                "Feedback":{...},
+                "Rating": {.}
+                },
+            "medium":{...}
+        }
+        "Overall_Rating":{.},
+        "Summary_Feedback":{...}
+    }
+    """
+    if not set_feedbackset:
+        print("No Feedback sets to save")
+    
+    feedback_set = feedbacks["feedback_set"]
+    overall_rating = feedbacks["Overall_Rating"]
+    summary_feedback = feedbacks["Summary_Feedback"]
+    
+    data = [{
+        "questionset_id": questionset_id,
+        "job_title":job_title,
+        "position": position,
+        "overall_rating":overall_rating,
+        "summary_feedback": summary_feedback,
+    }]
+
+    try: 
+        response = supabase.table('feedback_set').insert(data).execute()
+        print("Saved: Feedback Set")
+        if response.data:
+            feedbackset_id = response.data[0]["feedbackset_id"]
+            set_feedbacks(questionset_id, feedbackset_id, feedback_set)
+        return response
+    except Exception as e:
+        print(f"Error: Feedback Set Could not be saved: {e}")
+        return None
+
+def set_feedbacks(questionset_id, feedbackset_id, feedbacks):
+    """
+    CREATE TABLE Feedback (
+    feedback_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    feedbackset_id UUID REFERENCES Feedback_set(feedbackset_id) ON DELETE CASCADE,
+    question_id UUID REFERENCES Question(question_id) ON DELETE CASCADE,
+    difficulty TEXT NOT NULL,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    user_answer TEXT NOT NULL,
+    feedback TEXT,
+    rating NUMERIC
+    );
+    """
+    if not feedbacks:
+        print("No feedbacks to save")
+    data = []
+
+    question_response = supabase.table("question").select("*").eq("questionset_id",questionset_id).execute()
+    questions = question_response.data
+    # print(questions)
+    question_detail = {}
+    for q in questions:
+        question_detail[q['difficulty']] = q['question_id']
+
+    for difficulty, feedback in feedbacks.items():
+        data.append({
+            "feedbackset_id" : feedbackset_id,
+            "question_id" : question_detail[difficulty],
+            "difficulty": difficulty,
+            "question": feedback['Question'],
+            "answer": feedback['Answer'],
+            "user_answer": feedback["User_Answer"],
+            "feedback": feedback['Feedback'],
+            "rating": feedback['Rating']
+        })
+    
+    try:
+        print('Saving: Feedbacks')
+        response = supabase.table('feedback').insert(data).execute()
+        print('Saved: feedbacks')
+        return response
+    except Exception as e:
+        print(f'Error: Saving Feedbacks : {e}')
         return None

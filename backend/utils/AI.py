@@ -69,7 +69,8 @@ def feeback(user_response: Dict[str, Any]) -> Dict[str, Any]:
     """
     structured_propmt = f"""
     Analyze the following interview responses : {user_response} and provide detailed feedback and ratings. Return the response in this exact JSON structure, without any markdown formatting:
-    {{{{
+    {{
+        "feedback_set" : {{
             "easy": {{
                 "Question": "{user_response.get('easy', {})[0].get('Question', '')}",
                 "Answer": "{user_response.get('easy', {})[0].get('Answer', '')}",
@@ -147,7 +148,6 @@ def feeback(user_response: Dict[str, Any]) -> Dict[str, Any]:
             structured_propmt
         ])
         print("Success: Gemini response for feedback")
-        print(f'type of response: {type(response.text)}')
         return response.text
     except Exception as e:
         print(f"Error in Gemini response: {e}")

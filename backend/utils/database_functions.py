@@ -1,19 +1,25 @@
-from .database import to_question_set, get_user_answer, get_questions
+from .database import to_question_set, get_user_answer, get_questions, get_question_set, set_feedbackset
 
 def save_questions(job_title, position, questions):
     """
     Calls to_questionset -> Calls to_question
     """
+    print('Saving Questions...')
     to_question_set(job_title, position, questions)
     return None
  
 
-def save_feedbacks(job_title, position, feedbacks):
+def save_feedbacks(questionset_id, feedbacks):
+    print('Saving Feedback...')
+    question_set = get_question_set(questionset_id)[0]
+    job_title = question_set['job_title']
+    position = question_set['position']
+    set_feedbackset(questionset_id,job_title, position, feedbacks)
     return
 
 def combine_ua_questions(questionset_id):
     """
-    formatted_user_ans:
+    return: 
     "easy": [
         {
             "question": "What is the difference between == and === in JavaScript?",
