@@ -71,23 +71,23 @@ def feeback(user_response: Dict[str, Any]) -> Dict[str, Any]:
     Analyze the following interview responses : {user_response} and provide detailed feedback and ratings. Return the response in this exact JSON structure, without any markdown formatting:
     {{{{
             "easy": {{
-                "Question": "{user_response.get('easy', {}).get('Question', '')}",
-                "Answer": "{user_response.get('easy', {}).get('Answer', '')}",
-                "User_Answer": "{user_response.get('easy', {}).get('User_Answer', '')}",
+                "Question": "{user_response.get('easy', {})[0].get('Question', '')}",
+                "Answer": "{user_response.get('easy', {})[0].get('Answer', '')}",
+                "User_Answer": "{user_response.get('easy', {})[0].get('User_Answer', '')}",
                 "Feedback": "<detailed_analysis>",
                 "Rating": <score_0_to_5>
             }},
             "medium": {{
-                "Question": "{user_response.get('medium', {}).get('Question', '')}",
-                "Answer": "{user_response.get('medium', {}).get('Answer', '')}",
-                "User_Answer": "{user_response.get('medium', {}).get('User_Answer', '')}",
+                "Question": "{user_response.get('medium', {})[0].get('Question', '')}",
+                "Answer": "{user_response.get('medium', {})[0].get('Answer', '')}",
+                "User_Answer": "{user_response.get('medium', {})[0].get('User_Answer', '')}",
                 "Feedback": "<detailed_analysis>",
                 "Rating": <score_0_to_5>
             }},
             "hard": {{
-                "Question": "{user_response.get('hard', {}).get('Question', '')}",
-                "Answer": "{user_response.get('hard', {}).get('Answer', '')}",
-                "User_Answer": "{user_response.get('hard', {}).get('User_Answer', '')}",
+                "Question": "{user_response.get('hard', {})[0].get('Question', '')}",
+                "Answer": "{user_response.get('hard', {})[0].get('Answer', '')}",
+                "User_Answer": "{user_response.get('hard', {})[0].get('User_Answer', '')}",
                 "Feedback": "<detailed_analysis>",
                 "Rating": <score_0_to_5>
             }}
@@ -105,6 +105,7 @@ def feeback(user_response: Dict[str, Any]) -> Dict[str, Any]:
        - Suggest specific improvements
        - Provide examples where relevant
        - Keep feedback constructive and actionable
+       - Try to limit the feedback to 2-3 lines
 
     2. Rating Scale (0-5):
        0 = Completely incorrect or irrelevant
@@ -131,8 +132,23 @@ def feeback(user_response: Dict[str, Any]) -> Dict[str, Any]:
     - Maintain professional and constructive tone
     - Provide concrete examples for improvement
     - Consider technical accuracy and completeness
+
+    RESPONSE FORMAT REQUIREMENTS:
+    1. Provide ONLY the JSON object
+    2. Do NOT include markdown code blocks (```)
+    3. Do NOT include any explanatory text
+    4. Do NOT include any formatting
+    5. Start directly with the opening curly brace {{
+    6. End directly with the closing curly brace }}
     """
-    response = model.generate_content([
-        structured_propmt
-    ])
-    return response.text 
+    print("Prompting Gemini for feedback")
+    try:
+        response = model.generate_content([
+            structured_propmt
+        ])
+        print("Success: Gemini response for feedback")
+        print(f'type of response: {type(response.text)}')
+        return response.text
+    except Exception as e:
+        print(f"Error in Gemini response: {e}")
+        return None 
