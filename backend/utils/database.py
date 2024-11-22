@@ -75,3 +75,47 @@ def to_question(set_id, question_set):
         
     except Exception as e:
         print(f"Error Saving Question: {e}")
+
+
+
+def get_user_answer(questionset_id):
+
+    """
+    CREATE TABLE User_answers (
+    user_answer_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    questionset_id  UUID REFERENCES Question_set(questionset_id) on delete CASCADE,
+    question_id UUID REFERENCES Question(question_id) on delete CASCADE,
+    user_answer Text NOT NULL,
+    submitted_at timestamp default NOW()
+    )
+    """
+    try: 
+        response = supabase.table('user_answers').select("*").eq("questionset_id", questionset_id).execute()
+        # if response.error:
+        #     print(f"Error fetching user answers: {response.error.message}")
+        #     return None
+        print("User Response successfully accessed")
+        return response.data
+    except Exception as e:
+        print(f"Error in get_user_answers: {e}")
+        return None
+    
+
+
+def get_questions(question_id):
+    """
+    CREATE TABLE Question (
+    question_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    questionset_id UUID REFERENCES Question_set(questionset_id) ON DELETE CASCADE,
+    difficulty TEXT NOT NULL,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL
+    );
+    """
+    try:
+        response = supabase.table("question").select("*").in_("question_id",question_id).execute()
+        print("Questions successfully fetched")
+        return response.data
+    except Exception as e:
+        print(f"Error fetchind questions: {e}")
+        return None

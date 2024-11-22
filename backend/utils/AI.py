@@ -68,9 +68,8 @@ def feeback(user_response: Dict[str, Any]) -> Dict[str, Any]:
         HTTPException: If response generation or parsing fails
     """
     structured_propmt = f"""
-    Analyze the following interview responses and provide detailed feedback and ratings. Return the response in this exact JSON structure, without any markdown formatting:
-    {{
-        "questions_set": {{
+    Analyze the following interview responses : {user_response} and provide detailed feedback and ratings. Return the response in this exact JSON structure, without any markdown formatting:
+    {{{{
             "easy": {{
                 "Question": "{user_response.get('easy', {}).get('Question', '')}",
                 "Answer": "{user_response.get('easy', {}).get('Answer', '')}",

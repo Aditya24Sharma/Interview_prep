@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 import json
-from utils import save_questions, query, feeback
+from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions
 
 app = FastAPI()
 
@@ -17,4 +17,6 @@ def read_root():
 
 @app.get("/check_ans")
 def check_ans():
-    return
+    questionset_id = "1c859987-509a-419e-af47-4104827210ae"
+    formatted_user_ans = combine_ua_questions(questionset_id)
+    return {"user_answer": formatted_user_ans}
