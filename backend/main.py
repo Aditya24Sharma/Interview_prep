@@ -21,8 +21,6 @@ def check_ans():
     questionset_id = "1c859987-509a-419e-af47-4104827210ae"
     formatted_user_ans = combine_ua_questions(questionset_id)
     ans_feedback = feeback(formatted_user_ans)
-    # print('Feedback response')
-    # print(ans_feedback)
     ans_feedback_json = json.loads(ans_feedback)
     save_feedbacks(questionset_id, ans_feedback_json)
     return {"answer_feedback": ans_feedback_json}

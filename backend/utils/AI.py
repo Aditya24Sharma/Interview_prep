@@ -46,11 +46,16 @@ def query(prompt: str)->Dict[str, Any]:
 
         {prompt}
         """
-    
-    response = model.generate_content([
-        structured_propmt
-    ])
-    return response.text #response is a json so need to be converted to text for string
+    try:
+        print('Prompting Gemini for Questions...')
+        response = model.generate_content([
+            structured_propmt
+        ])
+        print('Success: Gemini response for Questions')
+        return response.text #response is a json so need to be converted to text for string
+    except Exception as e:
+        print(f'Error: Gemini Questions Failed: {e}')
+        return None
 
 
 def feeback(user_response: Dict[str, Any]) -> Dict[str, Any]:
@@ -150,5 +155,5 @@ def feeback(user_response: Dict[str, Any]) -> Dict[str, Any]:
         print("Success: Gemini response for feedback")
         return response.text
     except Exception as e:
-        print(f"Error in Gemini response: {e}")
+        print(f"Error in Gemini response for feedback: {e}")
         return None 
