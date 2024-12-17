@@ -1,6 +1,7 @@
 'user client'
 import { useState } from 'react'
 import { X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface NewInterviewFormProps {
   onClose: () => void
@@ -12,6 +13,8 @@ export default function NewInterviewForm({ onClose }: NewInterviewFormProps) {
     description: '',
     yearsExperience: '',
   })
+
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -39,7 +42,8 @@ export default function NewInterviewForm({ onClose }: NewInterviewFormProps) {
     }catch(error){
         console.error("Error submitting form to backend: ", error);
     };
-    onClose()
+    onClose();
+    router.push('/interview-session')
   }
 
   return (
