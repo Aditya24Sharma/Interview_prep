@@ -4,27 +4,22 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 // Dummy data for questions and answers
-const dummyQuestions = [
-  {
-    id: 1,
-    question: "What is the difference between 'let' and 'const' in JavaScript?",
-    answer: ""
-  },
-  {
-    id: 2,
-    question: "Explain the concept of closures in JavaScript.",
-    answer: ""
-  },
-  {
-    id: 3,
-    question: "What are the advantages of using React hooks?",
-    answer: ""
-  }
-]
+
+interface Questions{
+  answer: string;
+  difficulty: string;
+  id: string;
+  question: string; 
+}
 
 export default function InterviewSession() {
+
+  const [questionset_id, setQuestionset_id] = useState()
+  const [questions, setQuestions] = useState<Questions[]>([])
+
   const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [answers, setAnswers] = useState(dummyQuestions.map(q => q.answer))
+  const [answers, setAnswers] = useState(questions.map(q => q.answer))
+
   const [timeElapsed, setTimeElapsed] = useState(0)
   const router = useRouter()
 
@@ -36,6 +31,23 @@ export default function InterviewSession() {
     return () => clearInterval(timer)
   }, [])
 
+  useEffect(() => {
+    const fetchLatestQuestions = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/latest_questions");
+
+        const data = await response.json();
+        setQuestionset_id(data.question_setid)
+        setQuestions(data.questions);
+        console.log('Question_setid', data.question_setid)
+        console.log('Questions', data.questions)
+      } catch (error) {
+        console.error("Error retrieving questions", error);
+      }};
+      fetchLatestQuestions();
+    }, [])
+
+
   const handleAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newAnswers = [...answers]
     newAnswers[currentQuestion] = e.target.value
@@ -43,11 +55,10 @@ export default function InterviewSession() {
   }
 
   const handleNext = () => {
-    if (currentQuestion < dummyQuestions.length - 1) {
+    if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(prev => prev + 1)
     }
   }
-
   const handlePrevious = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(prev => prev - 1)
@@ -55,10 +66,9 @@ export default function InterviewSession() {
   }
 
   const handleSubmit = () => {
-    console.log(dummyQuestions)
-    console.log(answers);
-    // Here you would typically send the answers to your backend
     console.log('Submitted answers:', answers)
+    console.log('Questionset id:', questionset_id)
+    console.log('Questions: ', questions)
     // Navigate back to dashboard or to a results page
     router.push('/')
   }
@@ -79,7 +89,8 @@ export default function InterviewSession() {
       </div>
 
       <nav className="flex mb-6">
-        {dummyQuestions.map((_, index) => (
+        {/* dummyQuestions.map */}
+        {questions.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentQuestion(index)}
@@ -95,10 +106,7 @@ export default function InterviewSession() {
       </nav>
 
       <div className="mb-6">
-        {/* <h2 className="text-xl font-semibold mb-2">
-          Question {currentQuestion + 1}:
-        </h2> */}
-        <p className="mb-4 text-2xl">{dummyQuestions[currentQuestion].question}</p>
+        <p className="mb-4 text-2xl">{questions.length > 0 ? questions[currentQuestion].question: "Loading"}</p>
         <textarea
           value={answers[currentQuestion]}
           onChange={handleAnswerChange}
@@ -115,7 +123,7 @@ export default function InterviewSession() {
         >
           Previous
         </button>
-        {currentQuestion < dummyQuestions.length - 1 ? (
+        {currentQuestion < questions.length - 1 ? (
           <button
             onClick={handleNext}
             className="text-xl px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"

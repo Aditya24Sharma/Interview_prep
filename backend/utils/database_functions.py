@@ -18,10 +18,29 @@ def save_questions(job_title, description,YOE, questions):
 
 def get_latest_questions():
     question_setid = get_latest_questionsetid()
-    questions = get_questions_from_set_id([question_setid])
+    questions = get_questions_from_set_id([question_setid]) #A list with dict
     print('The questions retrieved are')
-    print(questions)
-    print(type(questions))
+    print(questions[0])
+    print(type(questions[0]))
+    result = {}
+    result['question_setid'] = question_setid
+    result['questions'] = []
+    for q in questions:
+        q_id = q['question_id']
+        ques = q['question']
+        diff = q['difficulty']
+        collective = {
+            'id': q_id,
+            'question': ques,
+            'difficulty': diff,
+            'answer': '',
+        }
+        result['questions'].append(collective)
+
+    return result
+
+
+    print(len(questions))
     # response = {'question_setid': question_setid,
     #             'questions': {questions['question_id', 'difficulty', 'question']}}
 

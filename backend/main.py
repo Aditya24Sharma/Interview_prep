@@ -47,7 +47,8 @@ async def newInterview(data: newInterview):
 
 @app.get("/latest_questions")
 def latest_questions():
-    get_latest_questions()
+    response = get_latest_questions()
+    return response
 
 @app.get("/check_ans")
 def check_ans():
