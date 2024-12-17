@@ -48,7 +48,25 @@ def to_question_set(job_title, description, YOE,  question_set):
     except Exception as e:
         print(f"Error Saving Question_set: {e}")
     
-    
+
+def get_latest_questionsetid():
+    try:
+        response = supabase.table("question_set").select('*').order('created_at', desc=True).limit(1).execute()
+        data = response.data
+        print(f'Retrieved questions set id: {data[0]['questionset_id']}')
+        id = data[0]['questionset_id']
+        return id
+    except Exception as e:
+        print(f'Failed to get latest questions set id: {e}')
+
+def get_questions_from_set_id(set_ids: List[str]):
+    try:
+        response = supabase.table("question").select("*").in_("questionset_id",set_ids).execute()
+        print("Questions successfully fetched")
+        return response.data
+    except Exception as e:
+        print(f"Error fetching questions: {e}")
+        return None
 
 
 def to_question(set_id, question_set):

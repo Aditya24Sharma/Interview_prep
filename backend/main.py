@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
-from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks
+from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions
 
 app = FastAPI()
 
@@ -45,7 +45,9 @@ async def newInterview(data: newInterview):
 #     save_questions(job_title, position, response_json)
     # return {"message": response_json}
 
-
+@app.get("/latest_questions")
+def latest_questions():
+    get_latest_questions()
 
 @app.get("/check_ans")
 def check_ans():

@@ -1,4 +1,4 @@
-from .database import to_question_set, get_user_answer, get_questions, get_question_set, set_feedbackset
+from .database import to_question_set, get_user_answer, get_questions, get_question_set, set_feedbackset, get_latest_questionsetid, get_questions_from_set_id
 
 def save_questions(job_title, description,YOE, questions):
     """
@@ -15,7 +15,17 @@ def save_questions(job_title, description,YOE, questions):
 #     print('Saving Questions...')
 #     to_question_set(job_title, position, questions)
 #     return None
- 
+
+def get_latest_questions():
+    question_setid = get_latest_questionsetid()
+    questions = get_questions_from_set_id([question_setid])
+    print('The questions retrieved are')
+    print(questions)
+    print(type(questions))
+    # response = {'question_setid': question_setid,
+    #             'questions': {questions['question_id', 'difficulty', 'question']}}
+
+
 
 
 def save_feedbacks(questionset_id, feedbacks):
