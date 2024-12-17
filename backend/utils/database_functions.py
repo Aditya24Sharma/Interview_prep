@@ -1,13 +1,22 @@
 from .database import to_question_set, get_user_answer, get_questions, get_question_set, set_feedbackset
 
-def save_questions(job_title, position, questions):
+def save_questions(job_title, description,YOE, questions):
     """
     Calls to_questionset -> Calls to_question
     """
     print('Saving Questions...')
-    to_question_set(job_title, position, questions)
+    to_question_set(job_title, description, YOE, questions)
     return None
  
+# def save_questions(job_title, position, questions):
+#     """
+#     Calls to_questionset -> Calls to_question
+#     """
+#     print('Saving Questions...')
+#     to_question_set(job_title, position, questions)
+#     return None
+ 
+
 
 def save_feedbacks(questionset_id, feedbacks):
     print('Saving Feedback...')

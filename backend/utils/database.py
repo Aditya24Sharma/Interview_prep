@@ -11,16 +11,18 @@ supabase_key = os.getenv('SUPABASE_APIKEY')
 #Initialize Supabase Client
 supabase: Client  = create_client(supabase_url, supabase_key)
 
-def to_question_set(job_title, position, question_set):
+def to_question_set(job_title, description, YOE,  question_set):
     """
     :param job_title: Title of the job (e.g., "Front-end Developer")
-    :param position: Position for the job (e.g., "Intern")
+    :param description: Description of the Job Positions
+    :param YOE: years of experience
     :param questions: List of dictionaries containing questions and answers
 
     CREATE TABLE Question_set (
     questionset_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     job_title TEXT NOT NULL,
-    position TEXT NOT NULL,
+    description TEXT NOT NULL,
+    YOE numeric NOT NULL
     created_at TIMESTAMP DEFAULT now()
     );
     """
@@ -30,7 +32,8 @@ def to_question_set(job_title, position, question_set):
     
     data = [{
         "job_title": job_title,
-        "position": position,
+        "description": description,
+        "YOE": YOE,
     }]
 
     try: 

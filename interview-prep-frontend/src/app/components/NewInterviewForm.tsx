@@ -21,10 +21,24 @@ export default function NewInterviewForm({ onClose }: NewInterviewFormProps) {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically send the form data to your backend
-    console.log('Form submitted:', formData)
+    try{
+        console.log('Sending form to backend: ', formData)
+        const response = await fetch("http://127.0.0.1:8000/newInterview",{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        const data = await response.json();
+
+        console.log('Form submitted')
+        console.log(data.message)
+    }catch(error){
+        console.error("Error submitting form to backend: ", error);
+    };
     onClose()
   }
 
