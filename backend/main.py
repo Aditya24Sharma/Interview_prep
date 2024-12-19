@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from typing import List
 from pydantic import BaseModel
 import json
-from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions
+from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers
 
 app = FastAPI()
 
@@ -19,13 +20,22 @@ class newInterview(BaseModel):
     description: str
     yearsExperience: str
 
+class frontendQuestions(BaseModel):
+    answer: str
+    difficulty: str
+    id: str
+    question: str
+
+class userAnswer(BaseModel):
+    questionset_id: str
+    QnA:List[frontendQuestions]
+
 @app.post("/newInterview")
 async def newInterview(data: newInterview):
     jobTitle = data.jobTitle
     description = data.description
     YOE = data.yearsExperience
     prompt = f'title: {jobTitle}, description: {description}, years of experience: {YOE}'
-    # prompt = f'title: {job_title}, position: {position}  '
     response = query(prompt)
     print('Query response')
     print(response)
@@ -49,6 +59,13 @@ async def newInterview(data: newInterview):
 def latest_questions():
     response = get_latest_questions()
     return response
+
+@app.post("/user_answers")
+async def user_answers(data: userAnswer):
+    questionset_id = data.questionset_id
+    QnA = data.QnA
+    save_user_answers(questionset_id, QnA)
+
 
 @app.get("/check_ans")
 def check_ans():

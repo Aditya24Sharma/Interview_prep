@@ -99,6 +99,12 @@ def to_question(set_id, question_set):
     except Exception as e:
         print(f"Error Saving Question: {e}")
 
+def set_user_response(data):
+    try:
+        supabase.table("user_answers").insert(data).execute()
+        print('Success: Saved user answers to Supabase')
+    except Exception as e:
+        print(f'Error while setting user_response to Supabase: {e}')
 
 
 def get_user_answer(questionset_id):
