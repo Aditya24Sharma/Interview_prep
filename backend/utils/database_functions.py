@@ -36,12 +36,6 @@ def get_latest_questions():
 
     return result
 
-
-    print(len(questions))
-    # response = {'question_setid': question_setid,
-    #             'questions': {questions['question_id', 'difficulty', 'question']}}
-
-
 async def save_user_answers(questionset_id, QnA):
     '''
     QnA: [
