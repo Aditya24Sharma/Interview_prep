@@ -53,7 +53,7 @@ def get_latest_questionsetid():
     try:
         response = supabase.table("question_set").select('*').order('created_at', desc=True).limit(1).execute()
         data = response.data
-        print(f'Retrieved questions set id: {data[0]['questionset_id']}')
+        # print(f'Retrieved questions set id: {data[0]['questionset_id']}')
         id = data[0]['questionset_id']
         return id
     except Exception as e:
@@ -168,13 +168,12 @@ def get_question_set(questionset_id):
         return None
 
 
-def set_feedbackset(questionset_id, job_title, position, feedbacks):
+def set_feedbackset(questionset_id, job_title, feedbacks):
     """
     CREATE TABLE Feedback_set (
     feedbackset_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     questionset_id UUID REFERENCES Question_set(questionset_id) ON DELETE CASCADE,
     job_title TEXT NOT NULL,
-    position TEXT NOT NULL,
     overall_rating NUMERIC,
     summary_feedback TEXT
     );
@@ -204,7 +203,6 @@ def set_feedbackset(questionset_id, job_title, position, feedbacks):
     data = [{
         "questionset_id": questionset_id,
         "job_title":job_title,
-        "position": position,
         "overall_rating":overall_rating,
         "summary_feedback": summary_feedback,
     }]

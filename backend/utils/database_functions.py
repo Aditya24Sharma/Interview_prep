@@ -19,9 +19,6 @@ def save_questions(job_title, description,YOE, questions):
 def get_latest_questions():
     question_setid = get_latest_questionsetid()
     questions = get_questions_from_set_id([question_setid]) #A list with dict
-    print('The questions retrieved are')
-    print(questions[0])
-    print(type(questions[0]))
     result = {}
     result['question_setid'] = question_setid
     result['questions'] = []
@@ -45,7 +42,7 @@ def get_latest_questions():
     #             'questions': {questions['question_id', 'difficulty', 'question']}}
 
 
-def save_user_answers(questionset_id, QnA):
+async def save_user_answers(questionset_id, QnA):
     '''
     QnA: [
     {
@@ -69,8 +66,7 @@ def save_feedbacks(questionset_id, feedbacks):
     print('Saving Feedback...')
     question_set = get_question_set(questionset_id)[0]
     job_title = question_set['job_title']
-    position = question_set['position']
-    set_feedbackset(questionset_id,job_title, position, feedbacks)
+    set_feedbackset(questionset_id,job_title, feedbacks)
     return
 
 def combine_ua_questions(questionset_id):
@@ -102,6 +98,6 @@ def combine_ua_questions(questionset_id):
             "correct_answer": question_details.get("answer", "Unknown"),
             "user_answer": ua["user_answer"]
         })
-
+    print('Success: Combine ua')
     return user_responses
 

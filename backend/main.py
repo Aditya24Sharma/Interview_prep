@@ -37,8 +37,8 @@ async def newInterview(data: newInterview):
     YOE = data.yearsExperience
     prompt = f'title: {jobTitle}, description: {description}, years of experience: {YOE}'
     response = query(prompt)
-    print('Query response')
-    print(response)
+    # print('Query response')
+    # print(response)
     response_json = json.loads(response)
     save_questions(jobTitle, description, YOE,  response_json)
     return {"message": response_json}
@@ -64,14 +64,13 @@ def latest_questions():
 async def user_answers(data: userAnswer):
     questionset_id = data.questionset_id
     QnA = data.QnA
-    save_user_answers(questionset_id, QnA)
+    print('Good till here')
+    await save_user_answers(questionset_id, QnA)
+    await check_ans(questionset_id)
 
-
-@app.get("/check_ans")
-def check_ans():
-    questionset_id = "1c859987-509a-419e-af47-4104827210ae"
+async def check_ans(questionset_id):
     formatted_user_ans = combine_ua_questions(questionset_id)
     ans_feedback = feeback(formatted_user_ans)
     ans_feedback_json = json.loads(ans_feedback)
     save_feedbacks(questionset_id, ans_feedback_json)
-    return {"answer_feedback": ans_feedback_json}
+    # return {"answer_feedback": ans_feedback_json}
