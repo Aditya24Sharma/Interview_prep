@@ -81,6 +81,7 @@ def review(questionset_id: str = Query(..., description="The id of the questions
     '''
     Gets the review of the user answers
     '''
+    print(questionset_id)
     questionset_id = questionset_id
     response = feedbackReview(questionset_id)
     return response

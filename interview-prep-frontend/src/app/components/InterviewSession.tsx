@@ -96,9 +96,9 @@ export default function InterviewSession() {
     )
     }catch(error){
       console.error("Error in saving user answers", error)
-    }
-    // Navigate back to dashboard or to a results page
-    router.push('/')
+    };
+
+    router.push(`/feedback-session?questionset_id=${questionset_id}`)
   }
 
   const formatTime = (seconds: number) => {

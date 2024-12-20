@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import {useState, useEffect} from 'react'
+// import {useSearchParams} from 'next/navigation'
 
 // Dummy data - replace with actual data from your backend
 const feedbackData = {
@@ -37,13 +38,94 @@ const feedbackData = {
   ]
 }
 
-export default function FeedbackSession() {
-  const [currentQuestion, setCurrentQuestion] = useState(0)
+interface FeedbackData{
+  feedback_id: string; 
+  feedbackset_id:string;
+  question_id: string;
+  difficulty: string;
+  question: string;
+  answer: string;
+  user_answer: string;
+  feedback: string;
+  rating: number;
+}
+
+type feedbackSessionProp ={
+  questionset_id: string | null;
+}
+
+export default function FeedbackSession({questionset_id}: feedbackSessionProp) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [jobTitle, setJobTitle] = useState('');
+  const [jobDescription, setJobDescription] = useState('');
+  const [yearsOfExperience, setYearsOfExperience] = useState('');
+  const [summaryFeedback, setSummaryFeedback] = useState('');
+  const [overallRating, setOverallRating] = useState(0);
+  const [feedbacks, setFeedbacks] = useState<FeedbackData[]>([]);
+
+  useEffect(() => {
+    async function fetchReviewData() {
+      if (!questionset_id) return;
+      
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/review?questionset_id=${questionset_id}`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setJobTitle(data.job_title);
+        setJobDescription(data.description);
+        setYearsOfExperience(data.YOE);
+        setSummaryFeedback(data.summary_feedback);
+        setOverallRating(data.overall_rating);
+        setFeedbacks(data.feedbacks);
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'An error occurred');
+        console.error("Error retrieving review data", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchReviewData();
+  }, [questionset_id]); // Only re-run if questionset_id changes
 
   const getColorClass = (rating: number) => {
     if (rating >= 4) return 'bg-green-100 text-green-800'
     if (rating >= 3) return 'bg-yellow-100 text-yellow-800'
     return 'bg-red-100 text-red-800'
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Interview Feedback</h1>
+        <p>Loading feedback...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Interview Feedback</h1>
+        <p>Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (!feedbacks || feedbacks.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Interview Feedback</h1>
+        <p>No feedback available.</p>
+      </div>
+    );
   }
 
   return (
@@ -52,18 +134,19 @@ export default function FeedbackSession() {
       
       <div className="bg-white shadow-md rounded-lg p-6 mb-8">
         <h2 className="text-2xl font-semibold mb-4">Job Details</h2>
-        <p><strong>Title:</strong> {feedbackData.jobTitle}</p>
-        <p><strong>Description:</strong> {feedbackData.jobDescription}</p>
-        <p><strong>Years of Experience:</strong> {feedbackData.yearsOfExperience}</p>
+        {/* JobTitle -> feedbackData.jobTitle */}
+        <p><strong>Title:</strong> {jobTitle}</p>
+        <p><strong>Description:</strong> {jobDescription}</p>
+        <p><strong>Years of Experience:</strong> {yearsOfExperience}</p>
       </div>
 
       <div className="bg-white shadow-md rounded-lg p-6 mb-8">
         <h2 className="text-2xl font-semibold mb-4">Overall Feedback</h2>
-        <p className="mb-4">{feedbackData.overallFeedback}</p>
+        <p className="mb-4">{summaryFeedback}</p>
         <div className="flex items-center">
           <span className="mr-2">Overall Rating:</span>
-          <span className={`px-2 py-1 rounded ${getColorClass(feedbackData.overallRating)}`}>
-            {feedbackData.overallRating}/5
+          <span className={`px-2 py-1 rounded ${getColorClass(overallRating)}`}>
+            {overallRating}/5
           </span>
         </div>
       </div>
@@ -72,7 +155,7 @@ export default function FeedbackSession() {
         <h2 className="text-2xl font-semibold mb-4">Question Feedback</h2>
         
         <nav className="flex mb-6">
-          {feedbackData.questions.map((_, index) => (
+          {feedbacks.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentQuestion(index)}
@@ -91,26 +174,26 @@ export default function FeedbackSession() {
           <h3 className="text-xl font-semibold mb-2">
             Question {currentQuestion + 1}:
           </h3>
-          <p className="mb-4">{feedbackData.questions[currentQuestion].question}</p>
+          <p className="mb-4">{feedbacks[currentQuestion].question}</p>
           
           <div className="mb-4">
             <h4 className="font-semibold">Your Answer:</h4>
-            <p className="bg-blue-50 text-blue-800 p-3 rounded">{feedbackData.questions[currentQuestion].userAnswer}</p>
+            <p className="bg-blue-50 text-blue-800 p-3 rounded">{feedbacks[currentQuestion].user_answer}</p>
           </div>
           
           <div className="mb-4">
             <h4 className="font-semibold">Feedback:</h4>
-            <p className="bg-yellow-50 text-yellow-800 p-3 rounded">{feedbackData.questions[currentQuestion].feedbackAnswer}</p>
+            <p className="bg-yellow-50 text-yellow-800 p-3 rounded">{feedbacks[currentQuestion].feedback}</p>
           </div>
           
           <div className="mb-4">
             <h4 className="font-semibold">Correct Answer:</h4>
-            <p className="bg-green-50 text-green-800 p-3 rounded">{feedbackData.questions[currentQuestion].correctAnswer}</p>
+            <p className="bg-green-50 text-green-800 p-3 rounded">{feedbacks[currentQuestion].answer}</p>
           </div>
           
           <div className="flex items-center">
             <span className="mr-2">Question Rating:</span>
-            <span className={`px-2 py-1 rounded ${getColorClass(feedbackData.questions[currentQuestion].rating)}`}>
+            <span className={`px-2 py-1 rounded ${getColorClass(feedbacks[currentQuestion].rating)}`}>
               {feedbackData.questions[currentQuestion].rating}/5
             </span>
           </div>
