@@ -19,7 +19,6 @@ export default function InterviewSession() {
 
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState(questions.map(q => q.answer))
-  console.log('Len of answers', answers.length)
 
   const [timeElapsed, setTimeElapsed] = useState(0)
   const router = useRouter()
