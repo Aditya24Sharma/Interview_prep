@@ -1,4 +1,4 @@
-from .database import to_question_set, get_user_answer, get_questions, get_question_set, set_feedbackset, get_latest_questionsetid, get_questions_from_set_id, set_user_response
+from .database import to_question_set, get_user_answer, get_questions, get_question_set, set_feedbackset, get_latest_questionsetid, get_questions_from_set_id, set_user_response, get_feedbackset, get_feedbacks
 
 def save_questions(job_title, description,YOE, questions):
     """
@@ -95,3 +95,19 @@ def combine_ua_questions(questionset_id):
     print('Success: Combine ua')
     return user_responses
 
+def feedbackReview(questionset_id):
+    print('Getting feedbacks')
+    question_set = get_question_set(questionset_id)[0]
+    print('Got questionset', question_set)
+    feedback_set = get_feedbackset(questionset_id)[0]
+    print('Got feedbackset', feedback_set)
+    feedbacks = get_feedbacks(feedback_set['feedbackset_id'])
+    print('Got feedbacks')
+    combined_response = {}
+    combined_response['job_title'] = question_set['job_title']
+    combined_response['description'] = question_set['description']
+    combined_response['YOE'] = question_set['YOE']
+    combined_response['summary_feedback'] = feedback_set['summary_feedback']
+    combined_response['overall_rating'] = feedback_set['overall_rating']
+    combined_response['feedbacks'] = feedbacks
+    return combined_response

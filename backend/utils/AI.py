@@ -41,7 +41,8 @@ def query(prompt: str)->Dict[str, Any]:
         1. Provide the response as pure JSON without code blocks or markdown
         2. Give relevant questions that might appear in actual technical interview for the respective positions 
         3. Ensure all answers are properly escaped for JSON
-        4. Do not provide any Examples inside any answers. 
+        4. Do not provide any Examples inside any answers.
+        5. Makes the answers as consice as possible.  
         5. Make questions and answers relevant to the following context:
 
         {prompt}
@@ -133,7 +134,8 @@ def feeback(user_response: Dict[str, Any]) -> Dict[str, Any]:
        - Keep tone constructive and encouraging
 
     Important:
-    - Ensure all feedback is specific and actionable
+    - All the feebacks should be second person singluar (you/your).
+    - Ensure all feedback is specific, consice and actionable
     - Focus on knowledge gaps and areas for improvement
     - Maintain professional and constructive tone
     - Provide concrete examples for improvement

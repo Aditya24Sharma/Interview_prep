@@ -1,9 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from pydantic import BaseModel
 import json
-from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers
+from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers, feedbackReview
 
 app = FastAPI()
 
@@ -75,3 +75,13 @@ async def check_ans(questionset_id):
     ans_feedback = feeback(formatted_user_ans)
     ans_feedback_json = json.loads(ans_feedback)
     save_feedbacks(questionset_id, ans_feedback_json)
+
+@app.get("/review")
+def review(questionset_id: str = Query(..., description="The id of the questionset to fetched")):
+    '''
+    Gets the review of the user answers
+    '''
+    questionset_id = questionset_id
+    response = feedbackReview(questionset_id)
+    return response
+

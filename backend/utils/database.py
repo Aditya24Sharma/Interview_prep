@@ -167,6 +167,23 @@ def get_question_set(questionset_id):
         print(f"Error: Question_set Retrival : {e}")
         return None
 
+def get_feedbackset(questionset_id):
+    """
+    CREATE TABLE Feedback_set (
+    feedbackset_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    questionset_id UUID REFERENCES Question_set(questionset_id) ON DELETE CASCADE,
+    job_title TEXT NOT NULL,
+    overall_rating NUMERIC,
+    summary_feedback TEXT
+    );
+    """
+    try:
+        response = supabase.table("feedback_set").select("*").eq("questionset_id", questionset_id).execute()
+        print("Success: Feedback_set Retrived")
+        return response.data
+    except Exception as e:
+        print(f"Error: Feedback_set Retrival : {e}")
+        return None
 
 def set_feedbackset(questionset_id, job_title, feedbacks):
     """
@@ -217,6 +234,30 @@ def set_feedbackset(questionset_id, job_title, feedbacks):
     except Exception as e:
         print(f"Error: Feedback Set Could not be saved: {e}")
         return None
+
+def get_feedbacks(feedbackset_id):
+    """
+    CREATE TABLE Feedback (
+    feedback_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    feedbackset_id UUID REFERENCES Feedback_set(feedbackset_id) ON DELETE CASCADE,
+    question_id UUID REFERENCES Question(question_id) ON DELETE CASCADE,
+    difficulty TEXT NOT NULL,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    user_answer TEXT NOT NULL,
+    feedback TEXT,
+    rating NUMERIC
+    );
+    """
+    try:
+        response = supabase.table("feedback").select("*").eq("feedbackset_id", feedbackset_id).execute()
+        print("Success: Feedbacks Retrived")
+        return response.data
+    except Exception as e:
+        print(f"Error: Feedbacks Retrival : {e}")
+        return None
+
+
 
 def set_feedbacks(questionset_id, feedbackset_id, feedbacks):
     """
