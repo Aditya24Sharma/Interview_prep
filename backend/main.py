@@ -2,8 +2,9 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from pydantic import BaseModel
+from datetime import datetime
 import json
-from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers, feedbackReview
+from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers, feedbackReview, get_all_feedbacks
 
 app = FastAPI()
 
@@ -86,3 +87,26 @@ def review(questionset_id: str = Query(..., description="The id of the questions
     response = feedbackReview(questionset_id)
     return response
 
+
+@app.get("/past_interviews")
+def past_interviews():
+    '''
+    Gets the past interviews
+    '''
+    def date_handler(obj):
+        print('Formatting date')
+        date_obj = datetime.fromisoformat(obj)
+        formatted_date = date_obj.strftime("%b %d %Y")
+        return formatted_date
+
+    response = get_all_feedbacks()
+    card = [] #
+    for r in response:
+        carddata = {}
+        carddata['job_title'] = r['job_title']
+        carddata['overall_rating'] = r['overall_rating']
+        # print(type(r['created_at']))
+        carddata['date'] = date_handler(r['created_at'])
+        card.append(carddata)
+
+    return card

@@ -257,7 +257,15 @@ def get_feedbacks(feedbackset_id):
         print(f"Error: Feedbacks Retrival : {e}")
         return None
 
-
+def get_all_feedbacks():
+    print("Fetching all feedbacks")
+    try:
+        response = supabase.table("feedback_set").select("*").execute()
+        print("Success: All Feedbacks Retrived")
+        return response.data
+    except Exception as e:
+        print(f"Error: All Feedbacks Retrival : {e}")
+        return None
 
 def set_feedbacks(questionset_id, feedbackset_id, feedbacks):
     """
