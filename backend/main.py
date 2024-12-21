@@ -103,6 +103,7 @@ def past_interviews():
     card = [] #
     for r in response:
         carddata = {}
+        carddata['questionset_id'] = r['questionset_id']
         carddata['job_title'] = r['job_title']
         carddata['overall_rating'] = r['overall_rating']
         carddata['date'] = date_handler(r['created_at'])

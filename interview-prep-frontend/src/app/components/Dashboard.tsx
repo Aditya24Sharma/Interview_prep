@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { PlusCircle } from 'lucide-react'
 
 interface InterviewDate{
+  questionset_id : string;
   job_title : string;
   overall_rating: number;
   date: string;

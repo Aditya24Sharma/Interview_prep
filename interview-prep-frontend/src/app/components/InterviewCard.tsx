@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Star } from 'lucide-react'
 
 interface Interview{
+    questionset_id: string
     job_title: string
     overall_rating: number
     date: string
@@ -27,12 +28,12 @@ export default function InterviewCard({interview}: {interview: Interview}){
               Retry
             </button>
           {/* </Link> */}
-          {/* <Link href={`/feedback-session?id=${interview.id}`} passHref> */}
+          <Link href={`/feedback-session?questionset_id=${interview.questionset_id}`} passHref>
             <button className="flex text-xl items-center justify-center bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300">
               <MessageCircle size={24} className="mr-2" />
               Feedback
             </button>
-          {/* </Link> */}
+          </Link>
         </div>
         </div>
       )

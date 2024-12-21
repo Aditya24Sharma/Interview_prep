@@ -98,9 +98,9 @@ def combine_ua_questions(questionset_id):
 def feedbackReview(questionset_id):
     print('Getting feedbacks')
     question_set = get_question_set(questionset_id)[0]
-    print('Got questionset', question_set)
+    # print('Got questionset', question_set)
     feedback_set = get_feedbackset(questionset_id)[0]
-    print('Got feedbackset', feedback_set)
+    # print('Got feedbackset', feedback_set)
     feedbacks = get_feedbacks(feedback_set['feedbackset_id'])
     print('Got feedbacks')
     combined_response = {}
