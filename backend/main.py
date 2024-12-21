@@ -105,7 +105,6 @@ def past_interviews():
         carddata = {}
         carddata['job_title'] = r['job_title']
         carddata['overall_rating'] = r['overall_rating']
-        # print(type(r['created_at']))
         carddata['date'] = date_handler(r['created_at'])
         card.append(carddata)
 
