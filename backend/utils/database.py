@@ -62,7 +62,7 @@ def get_latest_questionsetid():
 def get_questions_from_set_id(set_ids: List[str]):
     try:
         response = supabase.table("question").select("*").in_("questionset_id",set_ids).execute()
-        print("Questions successfully fetched")
+        print("Questions successfully fetched from id")
         return response.data
     except Exception as e:
         print(f"Error fetching questions: {e}")

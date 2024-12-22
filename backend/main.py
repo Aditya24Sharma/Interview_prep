@@ -4,7 +4,7 @@ from typing import List
 from pydantic import BaseModel
 from datetime import datetime
 import json
-from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers, feedbackReview, get_all_feedbacks
+from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers, feedbackReview, get_all_feedbacks, get_questions_from_set_id
 
 app = FastAPI()
 
@@ -110,3 +110,28 @@ def past_interviews():
         card.append(carddata)
 
     return card
+
+@app.get("/retry")
+def retry(questionset_id: str = Query(..., description="The id of the questionset to fetched")):
+    '''
+    Retry previous questions
+    '''
+    print(questionset_id)
+    questions = get_questions_from_set_id([questionset_id]) #A list with dict
+    result = {}
+    result['question_setid'] = questionset_id
+    result['questions'] = []
+    for q in questions:
+        q_id = q['question_id']
+        ques = q['question']
+        diff = q['difficulty']
+        collective = {
+            'id': q_id,
+            'question': ques,
+            'difficulty': diff,
+            'answer': '',
+        }
+        result['questions'].append(collective)
+
+    return result
+    

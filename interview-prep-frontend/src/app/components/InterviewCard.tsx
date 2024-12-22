@@ -22,12 +22,12 @@ export default function InterviewCard({interview}: {interview: Interview}){
             <span className='text-xl'>{interview.date}</span>
           </div>
           <div className="flex justify-between mt-6">
-          {/* <Link href={`/interview-session?id=${interview.id}`} passHref> */}
+          <Link href={`/retry-session?questionset_id=${interview.questionset_id}`} passHref>
             <button className="flex text-xl items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300">
               <RotateCcw size={24} className="mr-2" />
               Retry
             </button>
-          {/* </Link> */}
+          </Link>
           <Link href={`/feedback-session?questionset_id=${interview.questionset_id}`} passHref>
             <button className="flex text-xl items-center justify-center bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300">
               <MessageCircle size={24} className="mr-2" />
