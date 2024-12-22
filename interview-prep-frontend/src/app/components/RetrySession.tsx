@@ -79,15 +79,15 @@ export default function RetrySession({questionset_id}: RetrySessionProp) {
     console.log('Questionset id:', questionset_id)
     console.log('Questions: ', questions)
     try{
-      console.log('Sending the user answers to backend')
+      console.log('Updating the user answers to backend')
       combine_QnA()
-      console.log('Combined QnA')
       console.log(questions)
       const backenddata = {
         'questionset_id': questionset_id,
         'QnA': questions,
       }
-      await fetch("http://127.0.0.1:8000/user_answers",{
+      console.log(backenddata)
+      await fetch("http://127.0.0.1:8000/update_answer",{
         method: 'POST',
         headers: {
           'Content-Type':'application/json',

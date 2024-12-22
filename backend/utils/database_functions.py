@@ -1,4 +1,4 @@
-from .database import to_question_set, get_user_answer, get_questions, get_question_set, set_feedbackset, get_latest_questionsetid, get_questions_from_set_id, set_user_response, get_feedbackset, get_feedbacks
+from .database import to_question_set, get_user_answer, get_questions, get_question_set, set_feedbackset, get_latest_questionsetid, get_questions_from_set_id, set_user_response, get_feedbackset, get_feedbacks, update_user_response, delete_feedback_set
 
 def save_questions(job_title, description,YOE, questions):
     """
@@ -36,6 +36,7 @@ def get_latest_questions():
 
     return result
 
+
 async def save_user_answers(questionset_id, QnA):
     '''
     QnA: [
@@ -54,6 +55,27 @@ async def save_user_answers(questionset_id, QnA):
         data.append(res)
 
     set_user_response(data)
+
+async def update_user_answer(questionset_id, QnA):
+    '''
+    QnA: [
+    {
+    
+    }
+    ]
+    '''
+    data = []
+    for q in QnA:
+        res = {}
+        res['questionset_id'] = questionset_id
+        res['question_id'] = q.id
+        res['user_answer'] = q.answer
+        res['question'] = q.question
+        data.append(res)
+
+    await delete_feedback_set(questionset_id)
+    update_user_response(data)
+
 
 
 def save_feedbacks(questionset_id, feedbacks):

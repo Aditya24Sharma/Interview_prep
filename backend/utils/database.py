@@ -106,7 +106,6 @@ def set_user_response(data):
     except Exception as e:
         print(f'Error while setting user_response to Supabase: {e}')
 
-
 def get_user_answer(questionset_id):
 
     """
@@ -312,3 +311,21 @@ def set_feedbacks(questionset_id, feedbackset_id, feedbacks):
     except Exception as e:
         print(f'Error: Saving Feedbacks : {e}')
         return None
+    
+def update_user_response(data):
+    try:
+        for d in data:
+            supabase.table('user_answers').update(
+                {"user_answer":d['user_answer']}
+            ).eq("questionset_id", d['questionset_id']).eq("question_id", d['question_id']).execute()
+
+        print('Success: Updated user answers to Supabase')
+    except Exception as e:
+        print(f'Error while updating user_response to Supabase: {e}')
+
+async def delete_feedback_set(questionset_id):
+    try:
+        supabase.table('feedback_set').delete().eq("questionset_id", questionset_id).execute()
+        print('Success: Deleted feedback set')
+    except Exception as e:
+        print(f'Error while deleting feedback set: {e}')

@@ -4,7 +4,7 @@ from typing import List
 from pydantic import BaseModel
 from datetime import datetime
 import json
-from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers, feedbackReview, get_all_feedbacks, get_questions_from_set_id
+from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers, feedbackReview, get_all_feedbacks, get_questions_from_set_id, update_user_answer
 
 app = FastAPI()
 
@@ -135,3 +135,12 @@ def retry(questionset_id: str = Query(..., description="The id of the questionse
 
     return result
     
+@app.post("/update_answer")
+async def update_answer(data: userAnswer):
+    '''
+    Updates the user answer to db
+    '''
+    questionset_id = data.questionset_id
+    QnA = data.QnA
+    await update_user_answer(questionset_id, QnA)
+    await check_ans(questionset_id)
