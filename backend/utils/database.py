@@ -329,3 +329,17 @@ async def delete_feedback_set(questionset_id):
         print('Success: Deleted feedback set')
     except Exception as e:
         print(f'Error while deleting feedback set: {e}')
+
+
+def get_users(username: str):
+    print('Fetching users...')
+    try:
+        response = supabase.table('users').select('password_hash').eq('username', username).execute()
+        users = response.data
+        if not users or len(users) == 0:
+            return None
+        return users[0]
+    except Exception as e:
+        print(f'Error while fetching users: {e}')
+        return None
+    
