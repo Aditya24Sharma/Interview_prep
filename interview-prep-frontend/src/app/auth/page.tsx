@@ -2,20 +2,75 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { User, Lock, Mail, ArrowRight } from 'lucide-react'
+import { User, Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react'
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [name, setName] = useState('')
+  const [username, setUserName] = useState('')
+  const [error, setError] = useState('')
   const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically handle the authentication logic
-    console.log(isLogin ? 'Logging in...' : 'Signing up...', { email, password, name })
-    // For now, we'll just redirect to the dashboard
+
+    console.log(isLogin ? 'Logging in...' : 'Signing up...', { email, password, username })
+
+    if (isLogin){
+      const loginData = new URLSearchParams({
+        username: username,
+        password: password,
+      });
+      try{
+        const response = await fetch("http://127.0.0.1:8000/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: loginData.toString(),
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Login failed:", errorData.detail);
+          setError(errorData.detail)
+          return;
+        }
+        const data = await response.json();
+        console.log("Login successful!", data);
+    
+        // Save the token for later use
+        localStorage.setItem("access_token", data.access_token);
+      } catch (error) {
+        console.error("Error during login:", error);
+        setError("Something went wrong. Please try again later.")
+      }
+    }
+    else {
+      const signupData = {
+        'username': username,
+        'email': email,
+        'password': password,
+      }
+      try{
+        const response = await fetch("http://127.0.0.1:8000/signup",{
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(signupData),
+        })
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Signup failed:", errorData);
+          return;
+        }
+        const data = await response.json();
+        console.log("Signup successful!", data.message);
+      }catch(error){
+        console.error("Error during signup:", error);
+      }
+    }
     router.push('/')
   }
 
@@ -27,33 +82,45 @@ export default function AuthPage() {
           {isLogin ? 'Sign in to your account' : 'Create a new account'}
         </h2>
       </div>
-
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="py-8 px-4 shadow-lg shadow-gray-400 sm:rounded-xl sm:px-10 ">
+        {error && (
+            <div className="mb-4 bg-red-100 border-red-400 p-3 rounded-xl">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <AlertCircle className="h-6 w-5 text-red-400" aria-hidden="true" />
+                </div>
+                <div className="ml-2">
+                  <p className="text-lg text-red-700">
+                    {error}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {!isLogin && (
-              <div>
-                <label htmlFor="name" className="block text-2xl font-medium text-gray-700">
-                  Name
+          <div>
+                <label htmlFor="username" className="block text-2xl font-medium text-gray-700">
+                  Username
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <User className="h-5 w-5 text-gray-400" aria-hidden="true" />
                   </div>
                   <input
-                    id="name"
-                    name="name"
+                    id="username"
+                    name="username"
                     type="text"
                     required
                     className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 py-3 sm:text-xl border-gray-300 rounded-md"
-                    placeholder="John Doe"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    placeholder="JohnDoe123"
+                    value={username}
+                    onChange={(e) => setUserName(e.target.value)}
                   />
                 </div>
               </div>
-            )}
-            <div>
+            {!isLogin && (
+              <div>
               <label htmlFor="email" className="block text-2xl font-medium text-gray-700">
                 Email address
               </label>
@@ -74,7 +141,8 @@ export default function AuthPage() {
                 />
               </div>
             </div>
-
+            )}
+            {/* ------------------ */}
             <div>
               <label htmlFor="password" className="block text-2xl font-medium text-gray-700">
                 Password
@@ -121,7 +189,7 @@ export default function AuthPage() {
 
             <div className="mt-6">
               <button
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => (setIsLogin(!isLogin), setError(''), setUserName(''), setPassword(''))}
                 className="w-full inline-flex justify-center py-1 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-xl font-medium text-gray-500 hover:bg-gray-50"
               >
                 {isLogin ? 'Create an account' : 'Sign in to existing account'}

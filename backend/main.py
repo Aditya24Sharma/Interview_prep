@@ -35,6 +35,11 @@ class userAnswer(BaseModel):
     questionset_id: str
     QnA:List[frontendQuestions]
 
+class SignupData(BaseModel):
+    username: str
+    email: str
+    password: str
+
 @app.post("/newInterview")
 async def newInterview(data: newInterview):
     '''
@@ -150,11 +155,15 @@ async def update_answer(data: userAnswer):
     await check_ans(questionset_id)
 
 @app.post("/signup")
-async def signup(username:str, email:str, password: str):
+async def signup(data: SignupData):
     """
     Handle user signup
     Expects a username, email and password
     """
+    print(f'Signing up user. Data: {data}')
+    username = data.username
+    email = data.email
+    password = data.password
     if check_username(username):
         raise HTTPException(status_code=400, detail="Username already exists")
     
@@ -167,11 +176,15 @@ async def signup(username:str, email:str, password: str):
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     Handle user login.
-    Expects form_data with 'username' (or 'email') and 'password'.
+    Expects form_data with 'Username' and 'password'.
     Returns a JWT if credentials are valid.
     """
     user = get_users(form_data.username)
-    if not user or not verify_password(form_data.password,user['password_hash']):
+    print(f'Got user : {user}')
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    
+    if not verify_password(form_data.password,user['password_hash']):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     
     access_token = create_access_token(data = {"userId": user['user_id']})

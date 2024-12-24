@@ -337,6 +337,7 @@ def get_users(username: str):
         response = supabase.table('users').select('*').eq('username', username).execute()
         users = response.data
         if not users or len(users) == 0:
+            print(f'No users found with username: {username}')
             return None
         return users[0]
     except Exception as e:
