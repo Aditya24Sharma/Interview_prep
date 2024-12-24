@@ -1,11 +1,11 @@
 from fastapi import FastAPI, Query, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from typing import List
 from pydantic import BaseModel
 from datetime import datetime
 import json
-from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers, feedbackReview, get_all_feedbacks, get_questions_from_set_id, update_user_answer, create_access_token, get_users, verify_password, check_username, set_user, hash_password
+from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers, feedbackReview, get_all_feedbacks, get_questions_from_set_id, update_user_answer, create_access_token, get_users, verify_password, check_username, set_user, hash_password, decode_access_token
 import bcrypt
 
 app = FastAPI()
@@ -17,6 +17,8 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+BLACKLISTED_TOKENS = set()
 
 class newInterview(BaseModel):
     jobTitle: str
@@ -173,9 +175,27 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     
     access_token = create_access_token(data = {"userId": user['user_id']})
+    print('Success: Logged in')
 
     return {"access_token": access_token, "token_type":"bearer"}
 
-
- 
+@app.post("/logout")
+async def logout(token: str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
+    """
+    Handle user logout.
+    Invalidate the user's JWT token by adding it to a blacklist. 
+    """
+    print('Logging out...')
+    try:
+        payload = decode_access_token(token)
+        exp_timestamp = payload.get("exp")
+        if exp_timestamp and datetime.now().timestamp() > exp_timestamp:
+            raise HTTPException(status_code=401, detail="Token has already expired")
+    except:
+        raise HTTPException(status_code=401, detail="Invalid token")
     
+    if token in BLACKLISTED_TOKENS:
+        raise HTTPException(status_code=400, detail="Token is already blacklisted")
+    
+    BLACKLISTED_TOKENS.add(token)
+    return {"message": "User logged out successfully"}

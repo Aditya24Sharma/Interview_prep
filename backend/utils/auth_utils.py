@@ -49,7 +49,7 @@ def create_access_token(data: dict, expires_delta: timedelta = timedelta(hours =
     '''
     to_encode = data.copy()
     expire = datetime.now() + expires_delta
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire.timestamp()})
     return jwt.encode(to_encode, SECRET_KEY, algorithm = ALGORITHM)
 
 def decode_access_token(token:str) -> dict:
@@ -61,8 +61,9 @@ def decode_access_token(token:str) -> dict:
         dict: The decoded payload if valid
     '''
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms = [ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms = ALGORITHM)
         return payload
     except JWTError as e:
-        print(f'Token decode erro: {e}')
+        print(f'Token decode error: {e}')
         return None
+    

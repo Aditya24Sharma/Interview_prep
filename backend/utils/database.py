@@ -334,7 +334,7 @@ async def delete_feedback_set(questionset_id):
 def get_users(username: str):
     print('Fetching users...')
     try:
-        response = supabase.table('users').select('password_hash').eq('username', username).execute()
+        response = supabase.table('users').select('*').eq('username', username).execute()
         users = response.data
         if not users or len(users) == 0:
             return None
