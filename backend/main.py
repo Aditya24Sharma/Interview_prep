@@ -212,3 +212,22 @@ async def logout(token: str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
     
     BLACKLISTED_TOKENS.add(token)
     return {"message": "User logged out successfully"}
+
+@app.post('/validate_token')
+async def validate_token(token:str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
+    """
+    Validate a JWT token if it is still valid and not blacklisted
+    """
+    print('Validating token...')
+    try:
+        payload = decode_access_token(token)
+        exp_timestamp = payload.get("exp")
+        if exp_timestamp and datetime.now().timestamp() > exp_timestamp:
+            raise HTTPException(status_code=401, detail="Token has already expired")
+    except:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    if token in BLACKLISTED_TOKENS:
+        raise HTTPException(status_code=401, detail="Token is blacklisted")
+    
+    return {"message": "Token is valid"}
