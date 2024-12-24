@@ -77,7 +77,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen  flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full md:max-w-full">
-        <h1 className="text-7xl font-extrabold text-center text-blue-600 mb-6">Interview Prep</h1>
+        <h1 className="text-7xl font-extrabold text-center text-blue-800 mb-6">Interview Prep</h1>
         <h2 className="mt-9 text-center text-4xl font-extrabold text-gray-900">
           {isLogin ? 'Sign in to your account' : 'Create a new account'}
         </h2>
