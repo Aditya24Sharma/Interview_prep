@@ -1,6 +1,13 @@
+'use client'
 import { User } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 
 export default function Header() {
+  const pathname = usePathname()
+  
+  if (pathname === '/auth') {
+    return null
+  }
   return (
     <header className="bg-white shadow">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
