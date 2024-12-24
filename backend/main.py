@@ -5,7 +5,7 @@ from typing import List
 from pydantic import BaseModel
 from datetime import datetime
 import json
-from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers, feedbackReview, get_all_feedbacks, get_questions_from_set_id, update_user_answer, create_access_token, get_users, verify_password
+from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers, feedbackReview, get_all_feedbacks, get_questions_from_set_id, update_user_answer, create_access_token, get_users, verify_password, check_username, set_user, hash_password
 import bcrypt
 
 app = FastAPI()
@@ -147,6 +147,20 @@ async def update_answer(data: userAnswer):
     await update_user_answer(questionset_id, QnA)
     await check_ans(questionset_id)
 
+@app.post("/signup")
+async def signup(username:str, email:str, password: str):
+    """
+    Handle user signup
+    Expects a username, email and password
+    """
+    if check_username(username):
+        raise HTTPException(status_code=400, detail="Username already exists")
+    
+    hashed_password = await hash_password(password)
+    set_user(username, email, hashed_password)
+    return {"message": "User created successfully"}
+
+
 @app.post("/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
@@ -161,5 +175,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     access_token = create_access_token(data = {"userId": user['user_id']})
 
     return {"access_token": access_token, "token_type":"bearer"}
+
+
  
     

@@ -342,4 +342,34 @@ def get_users(username: str):
     except Exception as e:
         print(f'Error while fetching users: {e}')
         return None
+
+def check_username(username: str):
+    print('Checking username...')
+    try:
+        response = supabase.table('users').select('username').eq('username', username).execute()
+        users = response.data
+        if not users or len(users) == 0:
+            return False
+        return True
+    except Exception as e:
+        print(f'Error while checking username: {e}')
+        return None
     
+def set_user(username:str, email:str, password: str):
+    '''
+    Sets the user to the database
+    username(str), email(str), password(str)[hashed_password]
+    '''
+    print('Saving user to db...')
+    data = [{
+        "username": username,
+        "email": email,
+        "password_hash": password
+    }]
+    try:
+        response = supabase.table('users').insert(data).execute()
+        print('User saved to db')
+        return response
+    except Exception as e:
+        print(f'Error while saving user: {e}')
+        return None
