@@ -44,7 +44,7 @@ export default function AuthPage() {
     
         // Save the token for later use
         localStorage.setItem("access_token", data.access_token);
-        // localStorage.setItem("username", data.username);
+        localStorage.setItem("username", data.username);
         // console.log('Store Username', data.username);
         setUsername(data.username)
       } catch (error) {

@@ -10,9 +10,11 @@ export default function Header() {
   const router = useRouter()
   const dropdownRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
+  const [localuser, setLocalUser] = useState<string|null>('')
   const {username} = useUser();
 
   useEffect(() => {
+    setLocalUser(localStorage.getItem('username'))
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false)
@@ -42,6 +44,7 @@ export default function Header() {
     if (response.ok) {
       console.log("Logged out successfully");
       localStorage.removeItem("access_token");
+      localStorage.removeItem("username");
     router.push('/auth')
     } else {
       console.error("Logout failed");
@@ -58,7 +61,7 @@ export default function Header() {
             onClick={() => setIsProfileOpen(!isProfileOpen)}
             className="flex items-center space-x-4 focus:outline-none"
           >
-            <span className="text-2xl text-gray-600">{username}</span>
+            <span className="text-2xl text-gray-600">{username ? username : localuser }</span>
             <div className="bg-gray-200 rounded-full p-2">
               <User className="text-gray-600" size={32} />
             </div>
