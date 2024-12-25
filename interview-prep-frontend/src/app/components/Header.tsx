@@ -3,12 +3,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { User, LogOut } from 'lucide-react'
 import { useRouter, usePathname } from 'next/navigation'
+import { useUser } from '../context/UserContext'
 
 export default function Header() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const router = useRouter()
   const dropdownRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
+  const {username} = useUser();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -46,8 +48,6 @@ export default function Header() {
     }
   };
 
-  ;
-
 
   return (
     <header className="bg-white shadow">
@@ -58,7 +58,7 @@ export default function Header() {
             onClick={() => setIsProfileOpen(!isProfileOpen)}
             className="flex items-center space-x-4 focus:outline-none"
           >
-            <span className="text-2xl text-gray-600">John Doe</span>
+            <span className="text-2xl text-gray-600">{username}</span>
             <div className="bg-gray-200 rounded-full p-2">
               <User className="text-gray-600" size={32} />
             </div>

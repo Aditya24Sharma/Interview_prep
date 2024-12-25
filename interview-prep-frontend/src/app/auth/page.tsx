@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useUser } from '../context/UserContext'
 import { User, Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react'
 
 export default function AuthPage() {
@@ -11,6 +12,8 @@ export default function AuthPage() {
   const [username, setUserName] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
+
+  const {setUsername} = useUser();
 
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault()
@@ -41,6 +44,9 @@ export default function AuthPage() {
     
         // Save the token for later use
         localStorage.setItem("access_token", data.access_token);
+        // localStorage.setItem("username", data.username);
+        // console.log('Store Username', data.username);
+        setUsername(data.username)
       } catch (error) {
         console.error("Error during login:", error);
         setError("Something went wrong. Please try again later.")

@@ -187,10 +187,17 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not verify_password(form_data.password,user['password_hash']):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     
-    access_token = create_access_token(data = {"userId": user['user_id']})
+    data = {}
+    data['userId'] = user['user_id']
+    data['userName'] = user['username']
+    access_token = create_access_token(data = data)
     print('Success: Logged in')
 
-    return {"access_token": access_token, "token_type":"bearer"}
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer",
+        "username": user['username']
+    }
 
 @app.post("/logout")
 async def logout(token: str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
@@ -231,3 +238,4 @@ async def validate_token(token:str = Depends(OAuth2PasswordBearer(tokenUrl="logi
         raise HTTPException(status_code=401, detail="Token is blacklisted")
     
     return {"message": "Token is valid"}
+
