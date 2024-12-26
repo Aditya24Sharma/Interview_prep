@@ -34,8 +34,12 @@ export default function InterviewSession() {
   useEffect(() => {
     const fetchLatestQuestions = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/latest_questions");
-
+        const response = await fetch("http://127.0.0.1:8000/latest_questions", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`
+          }
+        });
         const data = await response.json();
         setQuestionset_id(data.question_setid)
         setQuestions(data.questions);

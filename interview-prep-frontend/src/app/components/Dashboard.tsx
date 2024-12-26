@@ -18,7 +18,13 @@ export default function Dashboard(){
     useEffect(() => {
         async function fetchPastInterviews(){
             try{
-                const response = await fetch("http://127.0.0.1:8000/past_interviews");
+                const response = await fetch("http://127.0.0.1:8000/past_interviews",{
+                  method: "GET",
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem('access_token')}`
+                  }
+                },
+                );
                 if(!response.ok){
                     throw new Error('Network response was not ok');
                 }

@@ -42,7 +42,7 @@ def create_access_token(data: dict, expires_delta: timedelta = timedelta(hours =
     '''
     Creates a JWT for user authentication
     Args:
-        data(dict): The payload to encode in the token (e.g., user_id)
+        data(dict): The payload to encode in the token ('userId', 'userName')
         expires_delta(timedelta): The token expiration time. 
     Returns:
         str: The generated JWT.

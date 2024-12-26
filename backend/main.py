@@ -5,7 +5,7 @@ from typing import List
 from pydantic import BaseModel
 from datetime import datetime
 import json
-from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers, feedbackReview, get_all_feedbacks, get_questions_from_set_id, update_user_answer, create_access_token, get_users, verify_password, check_username, set_user, hash_password, decode_access_token
+from utils import save_questions, query, feeback, get_user_answer, get_questions, combine_ua_questions, save_feedbacks, get_latest_questions, save_user_answers, feedbackReview, get_all_feedbacks, get_questions_from_set_id, update_user_answer, create_access_token, get_users, verify_password, check_username, set_user, hash_password, decode_access_token, getall_questionset_for_users
 import bcrypt
 
 app = FastAPI()
@@ -18,6 +18,7 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 BLACKLISTED_TOKENS = set()
 
 class newInterview(BaseModel):
@@ -41,10 +42,12 @@ class SignupData(BaseModel):
     password: str
 
 @app.post("/newInterview")
-async def newInterview(data: newInterview):
+async def newInterview(data: newInterview, token:str = Depends(oauth2_scheme)):
     '''
     A new interview question set created with the propmt given by the user
     '''
+    user = decode_access_token(token)
+    userId, userName = user['userId'], user['userName']
     jobTitle = data.jobTitle
     description = data.description
     YOE = data.yearsExperience
@@ -53,16 +56,18 @@ async def newInterview(data: newInterview):
     # print('Query response')
     # print(response)
     response_json = json.loads(response)
-    save_questions(jobTitle, description, YOE,  response_json)
+    save_questions(userId, jobTitle, description, YOE,  response_json)
     return {"message": response_json}
 
 @app.get("/latest_questions")
-def latest_questions():
+def latest_questions(token:str = Depends(oauth2_scheme)):
     '''
     Gets the latest question set from the db
     Called immediately after the user gives the details for the job
     '''
-    response = get_latest_questions()
+    user = decode_access_token(token)
+    userId, userName = user['userId'], user['userName']
+    response = get_latest_questions(userId)
     return response
 
 @app.post("/user_answers")
@@ -98,7 +103,7 @@ def review(questionset_id: str = Query(..., description="The id of the questions
 
 
 @app.get("/past_interviews")
-def past_interviews():
+async def past_interviews(token:str = Depends(oauth2_scheme)):
     '''
     Gets the past interviews
     '''
@@ -107,8 +112,13 @@ def past_interviews():
         date_obj = datetime.fromisoformat(obj)
         formatted_date = date_obj.strftime("%b %d %Y")
         return formatted_date
-
-    response = get_all_feedbacks()
+    print('fetching past interviews')
+    print(f'Got token{token}')
+    user = decode_access_token(token)
+    userId, userName = user['userId'], user['userName']
+    print(f'Past Interview Accessed by user: {user['userName']} id: {user['userId']}')
+    questionset_ids = getall_questionset_for_users(userId)
+    response = get_all_feedbacks(questionset_ids)
     card = [] #
     for r in response:
         carddata = {}
@@ -221,7 +231,7 @@ async def logout(token: str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
     return {"message": "User logged out successfully"}
 
 @app.post('/validate_token')
-async def validate_token(token:str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
+async def validate_token(token:str = Depends(oauth2_scheme)):
     """
     Validate a JWT token if it is still valid and not blacklisted
     """

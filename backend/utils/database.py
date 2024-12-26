@@ -11,7 +11,7 @@ supabase_key = os.getenv('SUPABASE_APIKEY')
 #Initialize Supabase Client
 supabase: Client  = create_client(supabase_url, supabase_key)
 
-def to_question_set(job_title, description, YOE,  question_set):
+def to_question_set(userId, job_title, description, YOE,  question_set):
     """
     :param job_title: Title of the job (e.g., "Front-end Developer")
     :param description: Description of the Job Positions
@@ -31,6 +31,7 @@ def to_question_set(job_title, description, YOE,  question_set):
         return
     
     data = [{
+        "user_id": userId,
         "job_title": job_title,
         "description": description,
         "YOE": YOE,
@@ -49,9 +50,9 @@ def to_question_set(job_title, description, YOE,  question_set):
         print(f"Error Saving Question_set: {e}")
     
 
-def get_latest_questionsetid():
+def get_latest_questionsetid(userId):
     try:
-        response = supabase.table("question_set").select('*').order('created_at', desc=True).limit(1).execute()
+        response = supabase.table("question_set").select('*').eq('user_id',userId).order('created_at', desc=True).limit(1).execute()
         data = response.data
         # print(f'Retrieved questions set id: {data[0]['questionset_id']}')
         id = data[0]['questionset_id']
@@ -148,6 +149,23 @@ def get_questions(question_ids: List[str]):
         print(f"Error fetching questions: {e}")
         return None
 
+def getall_questionset_for_users(userId)->List[str]:
+    '''
+    get all the questionset ids for a given user
+    '''
+    try: 
+        response = supabase.table("question_set").select("*").eq("user_id", userId).execute()
+        print("Success: Question_set Retrived")
+        data = response.data
+        questionset_ids = []
+        for d in data:
+            questionset_ids.append(d['questionset_id'])
+        return questionset_ids
+    
+    except Exception as e:
+        print(f"Error: Question_set Retrival : {e}")
+        return None
+
 
 def get_question_set(questionset_id):
     '''
@@ -166,7 +184,7 @@ def get_question_set(questionset_id):
         print(f"Error: Question_set Retrival : {e}")
         return None
 
-def get_feedbackset(questionset_id):
+def get_feedbackset(questionset_id: List[str]):
     """
     CREATE TABLE Feedback_set (
     feedbackset_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -177,7 +195,7 @@ def get_feedbackset(questionset_id):
     );
     """
     try:
-        response = supabase.table("feedback_set").select("*").eq("questionset_id", questionset_id).execute()
+        response = supabase.table("feedback_set").select("*").in_("questionset_id", questionset_id).execute()
         print("Success: Feedback_set Retrived")
         return response.data
     except Exception as e:
@@ -256,10 +274,10 @@ def get_feedbacks(feedbackset_id):
         print(f"Error: Feedbacks Retrival : {e}")
         return None
 
-def get_all_feedbacks():
+def get_all_feedbacks(questionset_ids : List[str]):
     print("Fetching all feedbacks")
     try:
-        response = supabase.table("feedback_set").select("*").execute()
+        response = supabase.table("feedback_set").select("*").in_('questionset_id', questionset_ids).execute()
         print("Success: All Feedbacks Retrived")
         return response.data
     except Exception as e:

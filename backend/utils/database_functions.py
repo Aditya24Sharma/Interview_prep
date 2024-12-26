@@ -1,11 +1,11 @@
 from .database import to_question_set, get_user_answer, get_questions, get_question_set, set_feedbackset, get_latest_questionsetid, get_questions_from_set_id, set_user_response, get_feedbackset, get_feedbacks, update_user_response, delete_feedback_set
 
-def save_questions(job_title, description,YOE, questions):
+def save_questions(userId, job_title, description,YOE, questions):
     """
     Calls to_questionset -> Calls to_question
     """
     print('Saving Questions...')
-    to_question_set(job_title, description, YOE, questions)
+    to_question_set(userId, job_title, description, YOE, questions)
     return None
  
 # def save_questions(job_title, position, questions):
@@ -16,8 +16,8 @@ def save_questions(job_title, description,YOE, questions):
 #     to_question_set(job_title, position, questions)
 #     return None
 
-def get_latest_questions():
-    question_setid = get_latest_questionsetid()
+def get_latest_questions(userId):
+    question_setid = get_latest_questionsetid(userId)
     questions = get_questions_from_set_id([question_setid]) #A list with dict
     result = {}
     result['question_setid'] = question_setid
@@ -121,7 +121,7 @@ def feedbackReview(questionset_id):
     print('Getting feedbacks')
     question_set = get_question_set(questionset_id)[0]
     # print('Got questionset', question_set)
-    feedback_set = get_feedbackset(questionset_id)[0]
+    feedback_set = get_feedbackset([questionset_id])[0]
     # print('Got feedbackset', feedback_set)
     feedbacks = get_feedbacks(feedback_set['feedbackset_id'])
     print('Got feedbacks')
