@@ -1,6 +1,9 @@
 'use client'
 
-import {useState, useEffect} from 'react'
+import { ArrowLeft } from 'lucide-react';
+import {useState, useEffect} from 'react';
+import Link from 'next/link'
+
 
 interface FeedbackData{
   feedback_id: string; 
@@ -98,7 +101,13 @@ export default function FeedbackSession({questionset_id}: feedbackSessionProp) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4">
+      <Link href = {'/'}>
+        <button className="mb-4 inline-flex items-center py-2 border border-transparent text-xl font-medium text-gray-700 focus:outline-none hover:underline hover:text-blue-900">
+          <ArrowLeft className="mr-2 h-5 w-5" size={32} />
+          Back to Dashboard
+        </button>
+      </Link>
       <h1 className="text-4xl font-bold mb-6">Interview Feedback</h1>
       
       <div className="bg-white shadow-md rounded-lg p-6 mb-8">
