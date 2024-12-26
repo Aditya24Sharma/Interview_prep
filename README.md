@@ -3,6 +3,9 @@
 ## **Overview**
 The **Interview Prep** is a comprehensive tool designed to help users prepare for job interviews efficiently. With features like tailored interview questions, feedback mechanisms, and user management, this app is your one-stop solution for interview preparation.
 
+## Demo
+Check out the [Demo](./demo/Readme.md) folder to see screenshots and videos of the app in action!
+
 ## **Features**
 - **User Authentication:**
   - Login and logout functionality using JWT for secure sessions.
@@ -28,6 +31,7 @@ The **Interview Prep** is a comprehensive tool designed to help users prepare fo
 - **Framework:** [FastAPI](https://fastapi.tiangolo.com/)
 - **Authentication:** OAuth2 with JWT
 - **Database:** PostgreSQL
+- **GenAI Model** Gemini-1.5-flash
 
 ## **Installation Instructions**
 ### **1. Clone the Repository**
